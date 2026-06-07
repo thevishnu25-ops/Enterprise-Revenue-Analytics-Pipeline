@@ -1,0 +1,37 @@
+-- 1. DATABASE AND TABLE SETUP
+CREATE DATABASE PORTFOLIO;
+USE PORTFOLIO;
+
+CREATE TABLE CUSTOMERS_DIM (
+    Customer_ID VARCHAR(50) PRIMARY KEY, 
+    Country CHAR(50)
+);
+
+CREATE TABLE TRANSACTION_FACT (
+    Transaction_ID VARCHAR(50) PRIMARY KEY,
+    Customer_ID VARCHAR(50),
+    Product_Name VARCHAR(255),
+    Amount DECIMAL(10, 2),
+    FOREIGN KEY (Customer_ID) REFERENCES CUSTOMERS_DIM(Customer_ID)
+);
+
+-- 2. DATA INGESTION
+INSERT INTO CUSTOMERS_DIM (Customer_ID, Country) 
+VALUES 
+('CUST-7721', 'India'), 
+('CUST-4412', 'USA');
+											
+INSERT INTO TRANSACTION_FACT (Transaction_ID, Customer_ID, Product_Name, Amount) 
+VALUES 
+('99812A', 'CUST-7721', 'premium cloud subscription', 120.00), 
+('99813B', 'CUST-4412', 'data analytics bootcamp', 450.00);
+
+-- 3. PRODUCTION REVENUE ANALYSIS
+SELECT 
+    C.Country, 
+    SUM(T.Amount) AS total_revenue 
+FROM TRANSACTION_FACT T 
+INNER JOIN CUSTOMERS_DIM C 
+    ON T.CUSTOMER_ID = C.CUSTOMER_ID 
+GROUP BY C.Country 
+ORDER BY total_revenue DESC;
